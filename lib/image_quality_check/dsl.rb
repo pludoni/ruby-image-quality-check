@@ -2,18 +2,22 @@ require 'i18n'
 # rubocop:disable Style/ClassVars,Metrics/BlockLength
 module ImageQualityCheck::DSL
   def define_rules_for(klass, attachment:, &block)
-    @rule = []
-    class_exec(&block)
     @rules ||= {}
-    @rules[[klass.to_s, attachment.to_s]] = @rule
-  end
-
-  def rule(name, weight: 1, &block)
-    @rule << { name: name, block: block, weight: weight }
+    @rules[[klass.to_s, attachment.to_s]] = block
   end
 
   def rules_for(klass, attachment)
-    @rules[[klass.to_s, attachment.to_s]] || (raise NotImplemented, I18n.t("image_quality_check.dsl.no_qualities_defined_for", klass: (klass), attachment: (attachment)))
+    rule = @rules[[klass.to_s, attachment.to_s]]
+    unless rule
+      raise NotImplemented, I18n.t("image_quality_check.dsl.no_qualities_defined_for", klass: (klass), attachment: (attachment))
+    end
+    @current_rule = []
+    class_exec(&rule)
+    @current_rule
+  end
+
+  def rule(name, weight: 1, &block)
+    @current_rule << { name: name, block: block, weight: weight }
   end
 
   def preferred_formats_rule(formats, weight: 1)

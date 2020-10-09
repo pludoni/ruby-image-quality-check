@@ -130,7 +130,7 @@ You also want to add a has_one relationship to the host models:
 
 ```ruby
 class Person < AR
-  has_one :image_quality_check_result, as: :attachable, dependent: :destroy, class_name: "ImageQualityCheck::Result"
+  has_one :image_quality_check_result, -> { where(attachable_column: :logo) }, as: :attachable, dependent: :destroy, class_name: "ImageQualityCheck::Result"
 end
 ```
 

@@ -10,13 +10,19 @@ RSpec.describe ImageQualityCheck do
   end
 
   specify 'png' do
-    result = ImageQualityCheck.analyze("spec/files/logo.png")
+    result = ImageQualityCheck.analyze("spec/files/pludoni.png")
+    expect(result[:background_is_transparent]).to be == true
     expect(result[:blur]).to be_kind_of(Hash)
   end
 
   specify 'white = NaN' do
     result = ImageQualityCheck.analyze("spec/files/white.jpg")
     expect(result[:blur]).to be_kind_of(Hash)
+  end
+
+  specify 'gif' do
+    result = ImageQualityCheck.analyze("spec/files/logo.gif")
+    expect(result).to be_kind_of(Hash)
   end
 
   specify 'determine quality' do
