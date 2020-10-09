@@ -1,14 +1,14 @@
-require_relative 'lib/image_quality/version'
+require_relative 'lib/image_quality_check/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "image_quality"
-  spec.version       = ImageQuality::VERSION
+  spec.name          = "image_quality_check"
+  spec.version       = ImageQualityCheck::VERSION
   spec.authors       = ["Stefan Wienert"]
   spec.email         = ["info@stefanwienert.de"]
 
   spec.summary       = %q{image quality}
   spec.description   = %q{image quality}
-  spec.homepage      = "https://github.com/pludoni/image_quality"
+  spec.homepage      = "https://github.com/pludoni/image_quality_check"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 

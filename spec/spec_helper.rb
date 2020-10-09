@@ -1,4 +1,4 @@
-require 'image_quality'
+require 'image_quality_check'
 require 'pry'
 
 RSpec.configure do |config|

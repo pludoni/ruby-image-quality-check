@@ -1,6 +1,6 @@
 require 'i18n'
 
-class ImageQuality::DetermineQuality
+class ImageQualityCheck::DetermineQuality
   def self.run(model, column_name)
     new(model, column_name).run
   end
@@ -18,13 +18,13 @@ class ImageQuality::DetermineQuality
       result = {
         quality: 0,
         details: {},
-        messages: [{ name: I18n.t('image_quality.not_found'), quality: 0 }]
+        messages: [{ name: I18n.t('image_quality_check.not_found'), quality: 0 }]
       }
       yield(result) if block_given?
       return result
     end
 
-    @analyse_result = ImageQuality.analyze(tmp_file.path)
+    @analyse_result = ImageQualityCheck.analyze(tmp_file.path)
     result = {
       quality: determine_quality,
       details: @analyse_result,
@@ -39,7 +39,7 @@ class ImageQuality::DetermineQuality
   def determine_quality
     qualities = []
     sum_of_weights = 0
-    ImageQuality.rules_for(@model.class, @column_name).each do |qq|
+    ImageQualityCheck.rules_for(@model.class, @column_name).each do |qq|
       error = nil
       on_error = ->(msg) { error = msg }
       result = instance_exec(@analyse_result, on_error, &qq[:block])

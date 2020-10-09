@@ -1,21 +1,21 @@
-RSpec.describe ImageQuality do
+RSpec.describe ImageQualityCheck do
   specify 'jpg good quality' do
-    result = ImageQuality.analyze("spec/files/person1.jpg")
+    result = ImageQualityCheck.analyze("spec/files/person1.jpg")
     expect(result[:blur]).to be_kind_of(Hash)
   end
 
   specify 'jpg small quality' do
-    result = ImageQuality.analyze("spec/files/pludoni.jpg")
+    result = ImageQualityCheck.analyze("spec/files/pludoni.jpg")
     expect(result[:blur]).to be_kind_of(Hash)
   end
 
   specify 'png' do
-    result = ImageQuality.analyze("spec/files/logo.png")
+    result = ImageQualityCheck.analyze("spec/files/logo.png")
     expect(result[:blur]).to be_kind_of(Hash)
   end
 
   specify 'white = NaN' do
-    result = ImageQuality.analyze("spec/files/white.jpg")
+    result = ImageQualityCheck.analyze("spec/files/white.jpg")
     expect(result[:blur]).to be_kind_of(Hash)
   end
 
@@ -24,18 +24,19 @@ RSpec.describe ImageQuality do
       def attachment
       end
     end
-    ImageQuality.define_rules_for(SomeClass, attachment: :attachment) do
+    ImageQualityCheck.define_rules_for(SomeClass, attachment: :attachment) do
       preferred_formats_rule(jpeg: 100)
       preferred_size_rule(500, 500)
     end
-    quality = ImageQuality::DetermineQuality.new(SomeClass.new, :attachment)
+    quality = ImageQualityCheck::DetermineQuality.new(SomeClass.new, :attachment)
 
     expect(quality).to receive(:read!) do |tmp_file|
       FileUtils.cp('spec/files/logo.png', tmp_file.path)
       true
     end
     result = quality.run
-    expect(result[:width]).to be_present
+    expect(result[:details][:width]).to be > 0
+    expect(result[:messages].length).to be == 2
     expect(result[:quality]).to be < 100
   end
 end

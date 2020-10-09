@@ -1,26 +1,15 @@
-require "image_quality/version"
-require 'image_quality/dsl'
-require 'image_quality/determine_quality'
+require "image_quality_check/version"
+require 'image_quality_check/dsl'
+require 'image_quality_check/determine_quality'
 require 'shellwords'
 require 'json'
 require 'open3'
 
-if defined?(Rails)
-  binding.pry
-  config.i18n.railties_load_path << paths["config/locales"]
-else
-  require 'i18n'
-  I18n.load_path << Dir[File.expand_path("config/locales") + "/*.yml"]
-  I18n.default_locale ||= :en
-  require 'pry'
-  binding.pry
-end
-
-module ImageQuality
-  extend ImageQuality::DSL
+module ImageQualityCheck
+  extend ImageQualityCheck::DSL
 
   def self.determine_quality(model, attachment, &block)
-    ImageQuality::DetermineQuality.run(model, attachment, &block)
+    ImageQualityCheck::DetermineQuality.run(model, attachment, &block)
   end
 
   def self.analyze(path_to_image)
@@ -53,3 +42,13 @@ module ImageQuality
     end
   end
 end
+
+if defined?(Rails)
+  class ImageQualityCheck::Engine < Rails::Engine
+  end
+else
+  require 'i18n'
+  I18n.load_path << Dir[File.expand_path("config/locales") + "/*.yml"]
+  I18n.default_locale ||= :en
+end
+
