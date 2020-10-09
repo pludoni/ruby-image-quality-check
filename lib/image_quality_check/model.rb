@@ -23,7 +23,7 @@ class ImageQualityCheck::Result < ApplicationRecord
   belongs_to :attachable, polymorphic: true
 
   def self.create_for_result(attachable, column, result)
-    check = ImageQualityCheck::Result.where(attachable: attachable, attachable_column: :logo).first_or_initialize
+    check = ImageQualityCheck::Result.where(attachable: attachable, attachable_column: column).first_or_initialize
     check.quality = result[:quality]
     check.result = {
       details: result[:details],
