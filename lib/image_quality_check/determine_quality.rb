@@ -1,30 +1,33 @@
 require 'i18n'
 
 class ImageQualityCheck::DetermineQuality
-  def self.run(model, column_name, &block)
-    new(model, column_name).run(&block)
+  def self.run(model, column_name, tmp_file = nil, &block)
+    new(model, column_name, tmp_file).run(&block)
   end
 
-  def initialize(model, column_name)
+  def initialize(model, column_name, tmp_file = nil)
     @model = model
     @column_name = column_name
     @column = model.send(column_name)
     @messages = []
+    @tmp_file = tmp_file
   end
 
   def run(&block)
-    tmp_file = Tempfile.new(['image_quality'])
-    unless read!(tmp_file)
-      result = {
-        quality: 0,
-        details: {},
-        messages: [{ name: I18n.t('image_quality_check.not_found'), quality: 0 }]
-      }
-      yield(result) if block_given?
-      return result
+    unless @tmp_file
+      @tmp_file = Tempfile.new(['image_quality'])
+      unless read!(@tmp_file)
+        result = {
+          quality: 0,
+          details: {},
+          messages: [{ name: I18n.t('image_quality_check.not_found'), quality: 0 }]
+        }
+        yield(result) if block_given?
+        return result
+      end
     end
 
-    @analyse_result = ImageQualityCheck.analyze(tmp_file.path)
+    @analyse_result = ImageQualityCheck.analyze(@tmp_file.path)
     result = {
       quality: determine_quality,
       details: @analyse_result,
