@@ -18,4 +18,24 @@ RSpec.describe ImageQuality do
     result = ImageQuality.analyze("spec/files/white.jpg")
     expect(result[:blur]).to be_kind_of(Hash)
   end
+
+  specify 'determine quality' do
+    class SomeClass
+      def attachment
+      end
+    end
+    ImageQuality.define_rules_for(SomeClass, attachment: :attachment) do
+      preferred_formats_rule(jpeg: 100)
+      preferred_size_rule(500, 500)
+    end
+    quality = ImageQuality::DetermineQuality.new(SomeClass.new, :attachment)
+
+    expect(quality).to receive(:read!) do |tmp_file|
+      FileUtils.cp('spec/files/logo.png', tmp_file.path)
+      true
+    end
+    result = quality.run
+    expect(result[:width]).to be_present
+    expect(result[:quality]).to be < 100
+  end
 end

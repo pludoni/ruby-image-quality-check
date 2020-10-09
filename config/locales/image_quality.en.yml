@@ -1,0 +1,10 @@
+---
+en:
+  image_quality:
+    not_found: "No attachment/photo found"
+    dsl:
+      no_qualities_defined_for: No qualities defined for [%{klass}, %{attachment}]
+      format: Format
+      format_ist_nutzen_sie: Format is %{result_format} - please prefer %{formats_keys_map_upcase_jo}
+      gro_e: Image dimension
+      gro_e_ist_x_px_achten_sie: Size is %{result_width}x%{result_height}px - Please use a minimum size of %{expected_width}x%{expected_height}px

@@ -1,29 +1,63 @@
 #!/usr/bin/env python3
-import cv2
-import sys
-import numpy as np
 
-img = cv2.imread(sys.argv[1])
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+import sys
+import json
+import numpy as np
+import cv2
+
+null = None
+
+img = cv2.imread(sys.argv[1], 0)
+
+
+clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+img = clahe.apply(img)
+
+# cv2.imwrite("/home/local/PDC01/swi/Projects/empfehlungsbund/public/test.jpg", img2)
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-faces_detect = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4)
+faces_detect = face_cascade.detectMultiScale(img, scaleFactor=1.5, minNeighbors=3)
 
-if len(faces_detect) == 0:
-    print('{"error": "no faces found"}')
-    exit(1)
 for (x, y, w, h) in faces_detect:
     # cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
     face = img[y:y + h, x:x + w]
 
-cv2.imwrite('/home/local/PDC01/swi/Projects/empfehlungsbund/public/test.jpg', face)
+out = {}
 
-# https://stackoverflow.com/questions/7765810/is-there-a-way-to-detect-if-an-image-is-blurry/29270276#29270276
-gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-local = np.max(cv2.convertScaleAbs(cv2.Laplacian(gray,3)))
+if len(faces_detect) > 0:
+    out['face'] = {}
+    local = np.max(cv2.convertScaleAbs(cv2.Laplacian(face,3)))
+    laplace_face = cv2.Laplacian(face, cv2.CV_64F).var()
+    out['face']['FaceBlurScale'] = int(local / 255 * 100)
+    out['face']['FaceBlurLaplaceVar'] = laplace_face
+else:
+    out['face'] = null
+    face = img
 
-laplace = cv2.Laplacian(face, cv2.CV_64F).var()
-print("{")
-print('  "Laplace (% 0..100)": ' + str(local / 255 * 100) + ",")
-print('  "Laplace (blurry)": ' + str(laplace))
-print("}")
+
+smile_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
+smile_detect = smile_cascade.detectMultiScale(face, minNeighbors=40, scaleFactor=1.14)
+
+eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+eye_detect = eye_cascade.detectMultiScale(face, minNeighbors=15)
+
+out['hasSmile'] = len(smile_detect) > 0
+
+if len(eye_detect) > 0:
+    for (x, y, w, h) in eye_detect:
+        eye = img[y:y + h, x:x + w]
+    local_laplace = np.max(cv2.convertScaleAbs(cv2.Laplacian(eye, 3)))
+    laplace_var = cv2.Laplacian(eye, cv2.CV_64F).var()
+    out['eyes'] = {
+        'LPScale': int(local_laplace / 255 * 100),
+        'LPVar': laplace_var
+    }
+else:
+    out['eyes'] = null
+
+laplace = cv2.Laplacian(img, cv2.CV_64F).var()
+local_laplace = np.max(cv2.convertScaleAbs(cv2.Laplacian(img, 3)))
+out['LPVar'] = laplace
+out['LPScale'] = (local_laplace / 255 * 100)
+
+print(json.dumps(out))

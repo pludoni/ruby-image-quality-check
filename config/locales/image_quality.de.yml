@@ -1,0 +1,11 @@
+---
+de:
+  image_quality:
+    not_found: Kein Anhang/Bild gefunden
+    dsl:
+      no_qualities_defined_for: No qualities defined for [%{klass}, %{attachment}]
+      format: Format
+      format_ist_nutzen_sie: Format ist %{result_format} - Nutzen Sie %{formats_keys_map_upcase_jo}
+      gro_e: Größe
+      gro_e_ist_x_px_achten_sie: Größe ist %{result_width}x%{result_height}px - Achten
+        Sie auf eine Mindestgröße von min. %{expected_width}x%{expected_height}px
