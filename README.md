@@ -1,5 +1,7 @@
 # ImageQuality
 
+[![Gem Version](https://badge.fury.io/rb/image_quality_check.svg)](https://badge.fury.io/rb/image_quality_check)
+
 Thin gem wrapper that uses ``imagemagick`` and ``python-opencv`` to help determine image quality.
 
 
@@ -19,7 +21,7 @@ apt-get install python3-pywt python3-opencv
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'image_quality'
+gem 'image_quality_check'
 ```
 
 ## Usage
