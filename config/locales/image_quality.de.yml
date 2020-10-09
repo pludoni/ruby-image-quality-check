@@ -1,6 +1,6 @@
 ---
 de:
-  image_quality:
+  image_quality_check:
     not_found: Kein Anhang/Bild gefunden
     dsl:
       no_qualities_defined_for: No qualities defined for [%{klass}, %{attachment}]

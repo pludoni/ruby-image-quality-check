@@ -9,11 +9,8 @@ null = None
 
 img = cv2.imread(sys.argv[1], 0)
 
-
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 img = clahe.apply(img)
-
-# cv2.imwrite("/home/local/PDC01/swi/Projects/empfehlungsbund/public/test.jpg", img2)
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 faces_detect = face_cascade.detectMultiScale(img, scaleFactor=1.5, minNeighbors=3)
