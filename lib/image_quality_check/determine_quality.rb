@@ -1,8 +1,8 @@
 require 'i18n'
 
 class ImageQualityCheck::DetermineQuality
-  def self.run(model, column_name)
-    new(model, column_name).run
+  def self.run(model, column_name, &block)
+    new(model, column_name).run(&block)
   end
 
   def initialize(model, column_name)

@@ -2,6 +2,7 @@
 
 Thin gem wrapper that uses ``imagemagick`` and ``python-opencv`` to help determine image quality.
 
+
 ## Installation
 
 System dependencies:
@@ -26,7 +27,7 @@ gem 'image_quality'
 ### Direct usage without model integration
 
 ```
-result = ImageQuality.analyze(path_to_file)
+result = ImageQualityCheck.analyze(path_to_file)
 
 {
   blur: {
@@ -47,6 +48,12 @@ This tool uses a shipped Python executable from https://github.com/pedrofrodenas
 The ``blur.LPScale`` gives you info if the image is blurry on a scale of 0..100
 
 ### DSL for defining rules for Models
+
+**LIMITS**:
+
+- currently only Paperclip attachment is implemented. Feel free to add other get-the-tmpfile adapter to ``ImageQualityCheck::DetermineQuality#read``
+
+---
 
 Create a initializer in your app:
 
@@ -92,19 +99,39 @@ end
 
 ```
 
+Then you can query for the quality rules to evaluate an attachment:
+
+```ruby
+ImageQuality.determine_quality(some_organisation, :logo) do |result|
+```
+
+### Using example Result model
+
+There is an ActiveRecord example model included in this Gem to save the ImageQuality Results to the database. It uses json column so that (modern) mysql/psql are both supported without any conditionals.
+
+Run:
+
+```
+bundle exec rake image_quality_check_engine:install:migrations
+bin/rails db:migrate
+```
+
 Then you can use this class like so (Example):
 
 ```ruby
+  # add to initializer:
+  require 'image_quality/model'
   ImageQuality.determine_quality(some_organisation, :logo) do |result|
-    # do something with this, e.g. save to a model (NOT SHIPPED)
-    check = ImageQualityCheck.where(attachable: some_organisation, attachable_column: :logo).first_or_initialize
-    check.quality = result[:quality]
-    check.result = {
-      details: result[:details],
-      messages: result[:message],
-    }
-    check.save!
+    ImageQualityCheck::Result.create_for_result(some_organisation, column, result)
   end
+```
+
+You also want to add a has_one relationship to the host models:
+
+```ruby
+class Person < AR
+  has_one :image_quality_check_result, as: :attachable, dependent: :destroy, class_name: "ImageQualityCheck::Result"
+end
 ```
 
 
