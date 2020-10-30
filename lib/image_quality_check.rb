@@ -17,7 +17,8 @@ module ImageQualityCheck
     # image magick gif delay bug invalid json
     # https://github.com/ImageMagick/ImageMagick/issues/1624
     out.gsub!(/("delay": "[^"]+")\n/m, "\\1,\n")
-    json = JSON.parse(out)['image']
+    raw_json = JSON.parse(out)
+    json = raw_json.is_a?(Array) ? raw_json.first['image'] : raw_json['image']
     background_is_transparent =
       json.dig('channelDepth', 'alpha') &&
       json['channelStatistics']['alpha']['min'] != json['channelStatistics']['alpha']['max']
