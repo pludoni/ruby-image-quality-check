@@ -6,9 +6,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Stefan Wienert"]
   spec.email         = ["info@stefanwienert.de"]
 
-  spec.summary       = %q{image quality}
-  spec.description   = %q{image quality}
-  spec.homepage      = "https://github.com/pludoni/image_quality_check"
+  spec.summary       = %q{Thin gem wrapper that uses imagemagick and python-opencv to help determine image quality.}
+  spec.description   = %q{Thin gem wrapper that uses imagemagick and python-opencv to help determine image quality of e.g. user portraits.}
+  spec.homepage      = "https://github.com/pludoni/ruby-image-quality-check"
   spec.license       = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
 
