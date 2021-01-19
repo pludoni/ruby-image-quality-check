@@ -26,8 +26,8 @@ module ImageQualityCheck
       format: json['format'].downcase,
       mime_type: json['mimeType'],
       background_is_transparent: background_is_transparent,
-      width: json.dig('geometry', 'width'),
-      height: json.dig('geometry', 'height'),
+      width: json.dig('geometry', 'width').to_i,
+      height: json.dig('geometry', 'height').to_i,
       quality: json['quality'],
       blur: blur_detect(path_to_image).map { |k, v| [ k.to_sym, v ] }.to_h
     }
