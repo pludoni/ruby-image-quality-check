@@ -31,7 +31,7 @@ RSpec.describe ImageQualityCheck do
       end
     end
     ImageQualityCheck.define_rules_for(SomeClass, attachment: :attachment) do
-      preferred_formats_rule(jpeg: 100)
+      preferred_formats_rule({jpeg: 100})
       preferred_size_rule(500, 500)
     end
     quality = ImageQualityCheck::DetermineQuality.new(SomeClass.new, :attachment)
