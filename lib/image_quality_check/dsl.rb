@@ -20,7 +20,7 @@ module ImageQualityCheck::DSL
     @current_rule << { name: name, block: block, weight: weight }
   end
 
-  def preferred_formats_rule(formats, weight: 1)
+  def preferred_formats_rule(weight: 1, **formats)
     rule I18n.t("image_quality_check.dsl.format"), weight: weight do |result, on_error|
       final_score = nil
       formats.each do |f, score|
