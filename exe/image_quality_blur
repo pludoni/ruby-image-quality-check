@@ -12,7 +12,12 @@ img = cv2.imread(sys.argv[1], 0)
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 img = clahe.apply(img)
 
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+if hasattr(cv2, 'data'):
+    prefix = cv2.data.haarcascades
+else:
+    prefix = '/usr/share/opencv4/haarcascades/'
+
+face_cascade = cv2.CascadeClassifier(prefix + 'haarcascade_frontalface_default.xml')
 faces_detect = face_cascade.detectMultiScale(img, scaleFactor=1.5, minNeighbors=3)
 
 for (x, y, w, h) in faces_detect:
@@ -32,10 +37,10 @@ else:
     face = img
 
 
-smile_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_smile.xml')
+smile_cascade = cv2.CascadeClassifier(prefix + 'haarcascade_smile.xml')
 smile_detect = smile_cascade.detectMultiScale(face, minNeighbors=40, scaleFactor=1.14)
 
-eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+eye_cascade = cv2.CascadeClassifier(prefix + 'haarcascade_eye.xml')
 eye_detect = eye_cascade.detectMultiScale(face, minNeighbors=15)
 
 out['hasSmile'] = len(smile_detect) > 0

@@ -9,7 +9,7 @@ module ImageQualityCheck::DSL
   def rules_for(klass, attachment)
     rule = @rules[[klass.to_s, attachment.to_s]]
     unless rule
-      raise NotImplemented, I18n.t("image_quality_check.dsl.no_qualities_defined_for", klass: (klass), attachment: (attachment))
+      raise NotImplementedError, I18n.t("image_quality_check.dsl.no_qualities_defined_for", klass: (klass), attachment: (attachment))
     end
     @current_rule = []
     class_exec(&rule)

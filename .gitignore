@@ -7,3 +7,5 @@
 /spec/reports/
 /tmp/
 spec/.examples.txt
+Gemfile.lock
+.tool-versions

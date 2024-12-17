@@ -62,6 +62,13 @@ class ImageQualityCheck::DetermineQuality
 
   def read!(tmp_file)
     case @column.class.to_s
+    when 'ActiveStorage::Attached::One'
+      if !@column.blob || !File.exist?(@column.blob.service.send(:path_for, @column.blob.key))
+        false
+      else
+        FileUtils.cp(@column.blob.service.send(:path_for, @column.blob.key), tmp_file.path)
+        true
+      end
     when "Paperclip::Attachment"
       if !@column.path || !File.exist?(@column.path)
         false
