@@ -14,12 +14,18 @@ module ImageQualityCheck
 
   def self.analyze(path_to_image)
     out = `convert #{Shellwords.escape path_to_image} json:`
-    # image magick gif delay bug invalid json
-    # https://github.com/ImageMagick/ImageMagick/issues/1624
-    out.gsub!(/("delay": "[^"]+")\n/m, "\\1,\n")
     return {} if out.empty?
 
-    raw_json = JSON.parse(out)
+    raw_json = nil
+    begin
+      raw_json = JSON.parse(out)
+    rescue StandardError
+      # image magick gif delay bug invalid json
+      # https://github.com/ImageMagick/ImageMagick/issues/1624
+      out.gsub!(/("delay": "[^"]+")\n/m, "\\1,\n")
+    end
+
+    raw_json ||= JSON.parse(out)
     json = raw_json.is_a?(Array) ? raw_json.first['image'] : raw_json['image']
     background_is_transparent =
       json.dig('channelDepth', 'alpha') &&
