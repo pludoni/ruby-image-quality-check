@@ -70,7 +70,10 @@ class ImageQualityCheck::DetermineQuality
         true
       end
     when "Paperclip::Attachment"
-      if !@column.path || !File.exist?(@column.path)
+      if @column.options[:storage] == :s3
+        @column.copy_to_local_file(:original, tmp_file.path)
+        true
+      elsif !@column.path || !File.exist?(@column.path)
         false
       else
         FileUtils.cp(@column.path, tmp_file.path)
