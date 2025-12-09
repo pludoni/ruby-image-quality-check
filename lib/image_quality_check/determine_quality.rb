@@ -16,7 +16,7 @@ class ImageQualityCheck::DetermineQuality
   def run(&block)
     unless @tmp_file
       @tmp_file = Tempfile.new(['image_quality'])
-      @tmp_file.bin_mode
+      @tmp_file.binmode
       unless read!(@tmp_file)
         result = {
           quality: 0,
