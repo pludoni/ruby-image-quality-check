@@ -16,6 +16,7 @@ class ImageQualityCheck::DetermineQuality
   def run(&block)
     unless @tmp_file
       @tmp_file = Tempfile.new(['image_quality'])
+      @tmp_file.bin_mode
       unless read!(@tmp_file)
         result = {
           quality: 0,
@@ -63,11 +64,21 @@ class ImageQualityCheck::DetermineQuality
   def read!(tmp_file)
     case @column.class.to_s
     when 'ActiveStorage::Attached::One'
-      if !@column.blob || !File.exist?(@column.blob.service.send(:path_for, @column.blob.key))
-        false
+      if @column.blob.service.respond_to?(:path_for)
+        if !@column.blob || !File.exist?(@column.blob.service.send(:path_for, @column.blob.key))
+          false
+        else
+          FileUtils.cp(@column.blob.service.send(:path_for, @column.blob.key), tmp_file.path)
+          true
+        end
       else
-        FileUtils.cp(@column.blob.service.send(:path_for, @column.blob.key), tmp_file.path)
-        true
+        if !@column.blob || !@column.blob.attached?
+          false
+        else
+          tmp_file.write(@column.download)
+          tmp_file.rewind
+          true
+        end
       end
     when "Paperclip::Attachment"
       if @column.options[:storage] == :s3
