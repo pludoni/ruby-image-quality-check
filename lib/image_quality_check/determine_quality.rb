@@ -13,7 +13,7 @@ class ImageQualityCheck::DetermineQuality
     @tmp_file = tmp_file
   end
 
-  def run(&block)
+  def run
     unless @tmp_file
       @tmp_file = Tempfile.new(['image_quality'])
       @tmp_file.binmode
@@ -32,7 +32,7 @@ class ImageQualityCheck::DetermineQuality
     result = {
       quality: determine_quality,
       details: @analyse_result,
-      messages: @messages,
+      messages: @messages
     }
     yield(result) if block_given?
     result
@@ -64,23 +64,28 @@ class ImageQualityCheck::DetermineQuality
   def read!(tmp_file)
     case @column.class.to_s
     when 'ActiveStorage::Attached::One'
+      return false if !@column.blob || !@column.attached?
+
+      copied_from_disk = false
       if @column.blob.service.respond_to?(:path_for)
-        if !@column.blob || !File.exist?(@column.blob.service.send(:path_for, @column.blob.key))
-          false
-        else
-          FileUtils.cp(@column.blob.service.send(:path_for, @column.blob.key), tmp_file.path)
-          true
-        end
-      else
-        if !@column.blob || !@column.blob.attached?
-          false
-        else
-          tmp_file.write(@column.download)
-          tmp_file.rewind
-          true
+        begin
+          path = @column.blob.service.send(:path_for, @column.blob.key)
+          if File.exist?(path)
+            FileUtils.cp(path, tmp_file.path)
+            copied_from_disk = true
+          end
+        rescue NoMethodError
+          # MirrorService responds to :path_for but may delegate to a service
+          # that doesn't support it (e.g. S3Service)
         end
       end
-    when "Paperclip::Attachment"
+
+      unless copied_from_disk
+        tmp_file.write(@column.download)
+        tmp_file.rewind
+      end
+      true
+    when 'Paperclip::Attachment'
       if @column.options[:storage] == :s3
         @column.copy_to_local_file(:original, tmp_file.path)
         true
